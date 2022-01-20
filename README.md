@@ -144,8 +144,8 @@ See [variables.tf] and [examples/] for details and use-cases.
     The maximum number of pods per node in this node pool. Note that
     this does not work on node pools which are "route-based" - that is,
     node pools belonging to clusters that do not have IP Aliasing
-    enabled. See the official documentation for more information:
-    https://cloud.google.com/kubernetes-engine/docs/how-to/flexible-pod-cidr
+    enabled. See the [official documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/flexible-pod-cidr)
+    for more information.
 
   - [**`max_surge`**](#attr-node_pools-max_surge): *(Optional `number`)*<a name="attr-node_pools-max_surge"></a>
 
