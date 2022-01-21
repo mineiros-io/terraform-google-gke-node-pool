@@ -48,7 +48,7 @@ Most common usage of the module:
 
 ```hcl
 module "terraform-google-gke-node-pool" {
-  source = "git@github.com:mineiros-io/terraform-google-gke-node-pool.git?ref=v0.0.1"
+  source = "git@github.com:mineiros-io/terraform-google-gke-node-pool.git?ref=v0.0.2"
 
   cluster_name = "name"
   project      = "project-id"
