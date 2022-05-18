@@ -20,7 +20,20 @@ header {
     text  = "Terraform Version"
   }
 
-  badge "tf-gcp-provider" {
+  # TODO: remove redundant provider badges
+  # badge "terraform-aws-provider" {
+  #   image = "https://img.shields.io/badge/AWS-4-F8991D.svg?logo=terraform"
+  #   url   = "https://github.com/terraform-providers/terraform-provider-aws/releases"
+  #   text  = "AWS Provider Version"
+  # }
+
+  # badge "terraform-github-provider" {
+  #   image = "https://img.shields.io/badge/GH-4-F8991D.svg?logo=terraform"
+  #   url = "https://github.com/terraform-providers/terraform-provider-github/releases"
+  #   text = "Github Provider Version"
+  # }
+
+  badge "terraform-google-provider" {
     image = "https://img.shields.io/badge/google-4-1A73E8.svg?logo=terraform"
     url   = "https://github.com/terraform-providers/terraform-provider-google/releases"
     text  = "Google Provider Version"
@@ -37,9 +50,8 @@ section {
   title   = "terraform-google-gke-node-pool"
   toc     = true
   content = <<-END
-    A [Terraform](https://www.terraform.io) module to create and manage Google
-    Kubernetes Engine (GKE)
-    [Node pools](https://cloud.google.com/container-engine/docs/node-pools).
+    A [Terraform](https://www.terraform.io) module to create and manage
+    services on [Google Cloud Platform (GCP)](gcp).
 
     **_This module supports Terraform version 1
     and is compatible with the Terraform Google Provider version 4._**
@@ -48,13 +60,28 @@ section {
     that enables our users and customers to easily deploy and manage reusable,
     secure, and production-grade cloud infrastructure.
   END
+  # TODO: uncomment or remove redundant description
+  # content = <<-END
+  #   A [Terraform] module to create and manage [Amazon Web Services (AWS)][aws].
+
+  #   **_This module supports Terraform version 1
+  #   and is compatible with the Terraform AWS Provider version 4._**
+
+  #   This module is part of our Infrastructure as Code (IaC) framework
+  #   that enables our users and customers to easily deploy and manage reusable,
+  #   secure, and production-grade cloud infrastructure.
+  # END
 
   section {
     title   = "Module Features"
     content = <<-END
-      This module implements the following Terraform resources
+      This module implements the following Terraform resources:
 
-      - `google_container_node_pool`
+      - `null_resource`
+
+      And supports additional features of the following modules:
+
+      - [mineiros-io/something/google](https://github.com/mineiros-io/terraform-google-something)
     END
   }
 
@@ -65,10 +92,7 @@ section {
 
       ```hcl
       module "terraform-google-gke-node-pool" {
-        source = "git@github.com:mineiros-io/terraform-google-gke-node-pool.git?ref=v0.0.2"
-
-        cluster_name = "name"
-        project      = "project-id"
+        source = "git@github.com:mineiros-io/terraform-google-gke-node-pool.git?ref=v0.0.1"
       }
       ```
     END
@@ -83,377 +107,189 @@ section {
     section {
       title = "Main Resource Configuration"
 
-      variable "cluster_name" {
-        required    = true
-        type        = string
-        description = <<-END
-          The cluster to create the node pool for. Cluster must be present in
-          location provided for zonal clusters.
-        END
-      }
+      # Please add main resource variables here
 
-      variable "project" {
-        required    = true
-        type        = string
-        description = <<-END
-          The ID of the project in which to create the node pool.
-        END
-      }
-
-      variable "location" {
-        type        = string
-        description = <<-END
-          The location (region or zone) of the cluster.
-        END
-      }
-
-      variable "node_locations" {
-        type        = list(string)
-        description = <<-END
-          The list of zones in which the node pool's nodes should be located.
-          Nodes must be in the region of their regional cluster or in the same
-          region as their cluster's zone for zonal clusters. If unspecified, the
-          cluster-level node_locations will be used.
-        END
-      }
-
-      variable "kubernetes_version" {
-        type        = string
-        description = <<-END
-          The Kubernetes version for the nodes in this pool. Note that if this
-          field and `auto_upgrade` are both specified, they will fight each
-          other for what the node version should be, so setting both is highly
-          discouraged. While a fuzzy version can be specified, it's recommended
-          that you specify explicit versions as Terraform will see spurious
-          diffs when fuzzy versions are used. See the
-          `google_container_engine_versions` data source's `version_prefix`
-          field to approximate fuzzy versions in a Terraform-compatible way.
-        END
-      }
+      # ### Example of a required variable
+      # variable "example_required" {
+      #   required    = true
+      #   type        = string
+      #   description = <<-END
+      #     The name of the resource
+      #   END
+      # }
+      #
+      # ### Example of an optional variable
+      # variable "example_name" {
+      #   type        = string
+      #   description = <<-END
+      #     The name of the resource
+      #   END
+      #   default     = "optional-resource-name"
+      # }
+      #
+      # ### Example of an object
+      # variable "example_user_object" {
+      #   type           = object(user)
+      #   default        = {}
+      #   readme_example = <<-END
+      #     user = {
+      #       name        = "marius"
+      #       description = "The guy from Berlin."
+      #     }
+      #   END
+      #
+      #   attribute "name" {
+      #     required    = true
+      #     type        = string
+      #     description = <<-END
+      #       The name of the user
+      #     END
+      #   }
+      #
+      #   attribute "description" {
+      #     type        = string
+      #     default     = ""
+      #     description = <<-END
+      #       A description describng the user in more detail
+      #     END
+      #   }
+      # }
     }
 
+    # section {
+    #   title = "Extended Resource Configuration"
+    #
+    #   # please uncomment and add extended resource variables here (resource not the main resource)
+    # }
+
     section {
-      title = "Extended Resource Configuration"
+      title = "Module Configuration"
 
-      variable "oauth_scopes" {
-        type        = string
+      variable "module_enabled" {
+        type        = bool
+        default     = true
         description = <<-END
-          Scopes that are used by NAP when creating node pools. Use the
-          https://www.googleapis.com/auth/cloud-platform scope to grant access
-          to all APIs. It is recommended that you set `service_account` to a
-          non-default service account and grant IAM roles to that service
-          account for only the resources that it needs.
+          Specifies whether resources in the module will be created.
         END
       }
 
-      variable "additional_oauth_scopes" {
-        type        = list(string)
-        default     = []
-        description = <<-END
-          Scopes that are used by NAP when creating node pools. Use the
-          https://www.googleapis.com/auth/cloud-platform scope to grant access
-          to all APIs. It is recommended that you set `service_account` to a
-          non-default service account and grant IAM roles to that service
-          account for only the resources that it needs.
+      # TODO: remove if not needed
+      # variable "module_tags" {
+      #   type           = map(string)
+      #   default        = {}
+      #   description    = <<-END
+      #     A map of tags that will be applied to all created resources that accept tags.
+      #     Tags defined with `module_tags` can be overwritten by resource-specific tags.
+      #   END
+      #   readme_example = <<-END
+      #     module_tags = {
+      #       environment = "staging"
+      #       team        = "platform"
+      #     }
+      #   END
+      # }
+
+      # variable "module_timeouts" {
+      #   type           = map(timeout)
+      #   description    = <<-END
+      #     A map of timeout objects that is keyed by Terraform resource name
+      #     defining timeouts for `create`, `update` and `delete` Terraform operations.
+      #
+      #     Supported resources are: `null_resource`, ...
+      #   END
+      #   readme_example = <<-END
+      #     module_timeouts = {
+      #       null_resource = {
+      #         create = "4m"
+      #         update = "4m"
+      #         delete = "4m"
+      #       }
+      #     }
+      #   END
+      #
+      #   attribute "create" {
+      #     type        = string
+      #     description = <<-END
+      #       Timeout for create operations.
+      #     END
+      #   }
+      #
+      #   attribute "update" {
+      #     type        = string
+      #     description = <<-END
+      #       Timeout for update operations.
+      #     END
+      #   }
+      #
+      #   attribute "delete" {
+      #     type        = string
+      #     description = <<-END
+      #       Timeout for delete operations.
+      #     END
+      #   }
+      # }
+
+      variable "module_depends_on" {
+        type           = list(dependency)
+        description    = <<-END
+          A list of dependencies.
+          Any object can be _assigned_ to this list to define a hidden external dependency.
         END
-      }
-
-      variable "node_pools" {
-        type        = list(node_pool)
-        description = <<-END
-          Manages a node pool in a Google Kubernetes Engine (GKE) cluster
-          separately from the cluster control plane.
-        END
-
-        attribute "name" {
-          type        = string
-          description = <<-END
-            The name of the node pool. If left blank, Terraform will auto-generate a unique name.
-          END
-        }
-
-        attribute "name_prefix" {
-          type        = string
-          description = <<-END
-            Creates a unique name for the node pool beginning with the
-            specified prefix. Conflicts with `name`.
-          END
-        }
-
-        attribute "kubernetes_version" {
-          type        = string
-          description = <<-END
-            The Kubernetes version for the nodes in this pool. Note that if this
-            field and `auto_upgrade` are both specified, they will fight each
-            other for what the node version should be, so setting both is highly
-            discouraged. While a fuzzy version can be specified, it's recommended
-            that you specify explicit versions as Terraform will see spurious
-            diffs when fuzzy versions are used. See the
-            `google_container_engine_versions` data source's `version_prefix`
-            field to approximate fuzzy versions in a Terraform-compatible way.
-          END
-        }
-
-        attribute "max_pods_per_node" {
-          type        = number
-          description = <<-END
-            The maximum number of pods per node in this node pool. Note that
-            this does not work on node pools which are "route-based" - that is,
-            node pools belonging to clusters that do not have IP Aliasing
-            enabled. See the [official documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/flexible-pod-cidr)
-            for more information.
-          END
-        }
-
-        attribute "max_surge" {
-          type        = number
-          description = <<-END
-            The number of additional nodes that can be added to the node pool
-            during an upgrade. Increasing `max_surge` raises the number of nodes
-            that can be upgraded simultaneously. Can be set to `0` or greater.
-          END
-        }
-
-        attribute "max_unavailable" {
-          type        = number
-          description = <<-END
-            The number of nodes that can be simultaneously unavailable during
-            an upgrade. Increasing `max_unavailable` raises the number of nodes
-            that can be upgraded in parallel. Can be set to `0` or greater.
-          END
-        }
-
-        attribute "auto_repair" {
-          type        = bool
-          default     = true
-          description = <<-END
-            Whether the nodes will be automatically repaired.
-          END
-        }
-
-        attribute "auto_upgrade" {
-          type        = bool
-          default     = false
-          description = <<-END
-            Whether the nodes will be automatically upgraded.
-          END
-        }
-
-        attribute "service_account" {
-          type        = string
-          description = <<-END
-            The service account to be used by the Node VMs. If not specified,
-            the "default" service account is used.
-          END
-        }
-
-        attribute "oauth_scopes" {
-          type        = set(string)
-          description = <<-END
-            Scopes that are used by NAP when creating node pools. Use the
-            https://www.googleapis.com/auth/cloud-platform scope to grant
-            access to all APIs. It is recommended that you set
-            `service_account` to a non-default service account and grant IAM
-            roles to that service account for only the resources that it
-            needs.
-          END
-        }
-
-        attribute "local_ssd_count" {
-          type        = number
-          default     = 0
-          description = <<-END
-            The amount of local SSD disks that will be attached to each
-            cluster node.
-          END
-        }
-
-        attribute "disk_size_gb" {
-          type        = number
-          default     = 100
-          description = <<-END
-            Size of the disk attached to each node, specified in GB. The
-            smallest allowed disk size is 10GB.
-          END
-        }
-
-        attribute "disk_type" {
-          type        = string
-          default     = "pd-standard"
-          description = <<-END
-            Type of the disk attached to each node (e.g. `pd-standard`,
-            `pd-balanced` or `pd-ssd`).
-          END
-        }
-
-        attribute "image_type" {
-          type        = string
-          default     = "COS"
-          description = <<-END
-            The image type to use for this node. Note that changing the image
-            type will delete and recreate all nodes in the node pool.
-          END
-        }
-
-        attribute "machine_type" {
-          type        = string
-          default     = "e2-medium"
-          description = <<-END
-            The name of a Google Compute Engine machine type. To create a
-            custom machine type, value should be set as specified
-            [here](https://cloud.google.com/compute/docs/reference/latest/instances#machineType).
-          END
-        }
-
-        attribute "preemptible" {
-          type        = bool
-          default     = false
-          description = <<-END
-            A boolean that represents whether or not the underlying node VMs
-            are preemptible. See the [official documentation](https://cloud.google.com/container-engine/docs/preemptible-vm)
-            for more information.
-          END
-        }
-
-        attribute "tags" {
-          type        = list(string)
-          default     = []
-          description = <<-END
-            The list of instance tags applied to all nodes. Tags are used to
-            identify valid sources or targets for network firewalls.
-          END
-        }
-
-        attribute "metadata" {
-          type        = map(string)
-          default     = {}
-          description = <<-END
-            The metadata key/value pairs assigned to instances in the cluster.
-            From GKE 1.12 onwards, disable-legacy-endpoints is set to true by
-            the API; if metadata is set but that default value is not
-            included, Terraform will attempt to unset the value. To avoid
-            this, set the value in your config.
-          END
-        }
-
-        attribute "min_cpu_platform" {
-          type        = string
-          description = <<-END
-            Minimum CPU platform to be used by this instance. The instance may
-            be scheduled on the specified or newer CPU platform. Applicable
-            values are the friendly names of CPU platforms, such as Intel
-            Haswell. See the [official documentation](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
-            for more information.
-          END
-        }
-
-        attribute "enable_integrity_monitoring" {
-          type        = bool
-          default     = true
-          description = <<-END
-            Defines whether the instance has integrity monitoring enabled.
-          END
-        }
-
-        attribute "enable_secure_boot" {
-          type        = bool
-          default     = false
-          description = <<-END
-            Defines whether the instance has Secure Boot enabled.
-          END
-        }
-      }
-
-      variable "tags" {
-        type        = list(string)
-        default     = []
-        description = <<-END
-          The list of instance tags applied to all nodes. Tags are used to
-          identify valid sources or targets for network firewalls.
-        END
-      }
-
-      variable "labels" {
-        type        = list(string)
-        default     = []
-        description = <<-END
-          The list of instance tags applied to all nodes. Tags are used to
-          identify valid sources or targets for network firewalls.
-        END
-      }
-
-      variable "metadata" {
-        type        = map(string)
-        default     = {}
-        description = <<-END
-          The metadata key/value pairs assigned to instances in the cluster.
-          From GKE 1.12 onwards, disable-legacy-endpoints is set to true by
-          the API; if metadata is set but that default value is not
-          included, Terraform will attempt to unset the value. To avoid
-          this, set the value in your config.
-        END
-      }
-
-      variable "node_metadata" {
-        type        = map(string)
-        default     = {}
-        description = <<-END
-          The metadata key/value pairs assigned to instances in the cluster.
-          From GKE 1.12 onwards, disable-legacy-endpoints is set to true by
-          the API; if metadata is set but that default value is not
-          included, Terraform will attempt to unset the value. To avoid
-          this, set the value in your config.
-        END
-      }
-
-      variable "service_account" {
-        type        = string
-        description = <<-END
-          The service account to be used by the Node VMs. If not specified, the
-          "default" service account is used.
-        END
-      }
-
-      variable "max_unavailable" {
-        type        = number
-        default     = 0
-        description = <<-END
-          The number of nodes that can be simultaneously unavailable during
-          an upgrade. Increasing `max_unavailable` raises the number of
-          nodes that can be upgraded in parallel. Can be set to `0` or
-          greater.
-        END
-      }
-
-      variable "max_surge" {
-        type        = number
-        default     = 1
-        description = <<-END
-          The number of additional nodes that can be added to the node pool
-          during an upgrade. Increasing `max_surge` raises the number of
-          nodes that can be upgraded simultaneously. Can be set to `0` or
-          greater.
+        default        = []
+        readme_example = <<-END
+          module_depends_on = [
+            null_resource.name
+          ]
         END
       }
     }
   }
 
   section {
+    title   = "Module Outputs"
+    content = <<-END
+      The following attributes are exported in the outputs of the module:
+    END
+
+    # output "example" {
+    #   type        = bool
+    #   description = <<-END
+    #     An example output.
+    #   END
+    # }
+  }
+
+  section {
     title = "External Documentation"
 
     section {
-      title   = "Google Documentation"
+      title   = "GCP Documentation"
       content = <<-END
-        - https://cloud.google.com/container-engine/docs/node-pools
+        - https://cloud.google.com/docs
       END
     }
 
     section {
-      title   = "Terraform GCP Provider Documentation"
+      title   = "Terraform Google Provider Documentation"
       content = <<-END
-        - https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_node_pool
+        - https://registry.terraform.io/providers/hashicorp/google/latest/docs
       END
     }
+
+    # TODO: uncommnt if needed, otherwise remove
+    # section {
+    #   title   = "AWS Documentation"
+    #   content = <<-END
+    #     - https://docs.aws.amazon.com/
+    #   END
+    # }
+
+    # section {
+    #   title   = "Terraform AWS Provider Documentation"
+    #   content = <<-END
+    #     - https://registry.terraform.io/providers/hashicorp/aws/latest/docs
+    #   END
+    # }
   }
 
   section {
@@ -538,12 +374,6 @@ references {
   ref "badge-license" {
     value = "https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg"
   }
-  ref "releases-terraform" {
-    value = "https://github.com/hashicorp/terraform/releases"
-  }
-  ref "releases-aws-provider" {
-    value = "https://github.com/terraform-providers/terraform-provider-aws/releases"
-  }
   ref "apache20" {
     value = "https://opensource.org/licenses/Apache-2.0"
   }
@@ -555,6 +385,9 @@ references {
   }
   ref "aws" {
     value = "https://aws.amazon.com/"
+  }
+  ref "gcp" {
+    value = "https://cloud.google.com/"
   }
   ref "semantic versioning (semver)" {
     value = "https://semver.org/"
